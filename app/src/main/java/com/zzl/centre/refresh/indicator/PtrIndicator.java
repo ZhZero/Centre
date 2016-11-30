@@ -2,6 +2,8 @@ package com.zzl.centre.refresh.indicator;
 
 import android.graphics.PointF;
 
+import com.zzl.centre.refresh.util.PtrCLog;
+
 public class PtrIndicator {
 
     public final static int POS_START = 0;
@@ -70,13 +72,15 @@ public class PtrIndicator {
     public void onPressDown(float x, float y) {
         mIsUnderTouch = true;
         mPressedPos = mCurrentPos;
+        PtrCLog.v("onPressDown", String.valueOf(mCurrentPos));
         mPtLastMove.set(x, y);
     }
 
     public final void onMove(float x, float y) {
         float offsetX = x - mPtLastMove.x;
         float offsetY = (y - mPtLastMove.y);
-        processOnMove(x, y, offsetX, offsetY);
+//        processOnMove(x, y, offsetX, offsetY);
+        setOffset(offsetX, offsetY / mResistance);
         mPtLastMove.set(x, y);
     }
 

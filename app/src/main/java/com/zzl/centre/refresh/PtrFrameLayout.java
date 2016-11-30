@@ -54,6 +54,9 @@ public class PtrFrameLayout extends ViewGroup {
     private ScrollChecker mScrollChecker;
     private int mPagingTouchSlop;
     private int mHeaderHeight;
+    /***
+     * 适配ViewPager用
+     */
     private boolean mDisableWhenHorizontalMove = false;
     private int mFlag = 0x00;
 
@@ -118,6 +121,7 @@ public class PtrFrameLayout extends ViewGroup {
 
     @Override
     protected void onFinishInflate() {
+        PtrCLog.v(LOG_TAG, "onFinishInflate");
         final int childCount = getChildCount();
         if (childCount > 2) {
             throw new IllegalStateException("PtrFrameLayout can only contains 2 children");
@@ -188,11 +192,12 @@ public class PtrFrameLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        PtrCLog.v(LOG_TAG, "onMeasure");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         if (isDebug()) {
             PtrCLog.d(LOG_TAG, "onMeasure frame: width: %s, height: %s, padding: %s %s %s %s",
-                    getMeasuredHeight(), getMeasuredWidth(),
+                    getMeasuredWidth(), getMeasuredHeight(),
                     getPaddingLeft(), getPaddingRight(), getPaddingTop(), getPaddingBottom());
 
         }
@@ -232,6 +237,7 @@ public class PtrFrameLayout extends ViewGroup {
 
     @Override
     protected void onLayout(boolean flag, int i, int j, int k, int l) {
+        PtrCLog.v(LOG_TAG, "onLayout");
         layoutChildren();
     }
 
@@ -248,6 +254,7 @@ public class PtrFrameLayout extends ViewGroup {
             final int right = left + mHeaderView.getMeasuredWidth();
             final int bottom = top + mHeaderView.getMeasuredHeight();
             mHeaderView.layout(left, top, right, bottom);
+            PtrCLog.v(LOG_TAG, "onLayout header: %s %s %s %s", left, top, right, bottom);
             if (isDebug()) {
                 PtrCLog.d(LOG_TAG, "onLayout header: %s %s %s %s", left, top, right, bottom);
             }
@@ -316,15 +323,19 @@ public class PtrFrameLayout extends ViewGroup {
 
             case MotionEvent.ACTION_MOVE:
                 mLastMoveEvent = e;
+                //对offsetX、offsetY赋值
                 mPtrIndicator.onMove(e.getX(), e.getY());
                 float offsetX = mPtrIndicator.getOffsetX();
+                //Y2 - Y1 的距离差，当offsetY > 0，表示手指向下滑动，并且滑动的距离为offsetY
                 float offsetY = mPtrIndicator.getOffsetY();
 
+                //判断横向滑动以及手指最短滑动距离
                 if (mDisableWhenHorizontalMove && !mPreventForHorizontal && (Math.abs(offsetX) > mPagingTouchSlop && Math.abs(offsetX) > Math.abs(offsetY))) {
                     if (mPtrIndicator.isInStartPosition()) {
                         mPreventForHorizontal = true;
                     }
                 }
+                //判断横向滑动
                 if (mPreventForHorizontal) {
                     return dispatchTouchEventSupper(e);
                 }
@@ -339,11 +350,13 @@ public class PtrFrameLayout extends ViewGroup {
                 }
 
                 // disable move when header not reach top
+                //checkCanDoRefresh由开发者自己判断(eg:当ListView还可以继续向下滑动时，不应该执行下拉刷新操作)
                 if (moveDown && mPtrHandler != null && !mPtrHandler.checkCanDoRefresh(this, mContent, mHeaderView)) {
                     return dispatchTouchEventSupper(e);
                 }
 
                 if ((moveUp && canMoveUp) || moveDown) {
+                    //执行滑动代码
                     movePos(offsetY);
                     return true;
                 }
@@ -358,6 +371,7 @@ public class PtrFrameLayout extends ViewGroup {
      */
     private void movePos(float deltaY) {
         // has reached the top
+        //这种情况只有在moveUp && canMoveUp才会发生
         if ((deltaY < 0 && mPtrIndicator.isInStartPosition())) {
             if (DEBUG) {
                 PtrCLog.e(LOG_TAG, String.format("has reached the top"));
@@ -367,7 +381,7 @@ public class PtrFrameLayout extends ViewGroup {
 
         int to = mPtrIndicator.getCurrentPosY() + (int) deltaY;
 
-        // over top
+        // over top   to < 0
         if (mPtrIndicator.willOverTop(to)) {
             if (DEBUG) {
                 PtrCLog.e(LOG_TAG, String.format("over top"));
@@ -975,6 +989,7 @@ public class PtrFrameLayout extends ViewGroup {
             mScroller = new Scroller(getContext());
         }
 
+        @Override
         public void run() {
             boolean finish = !mScroller.computeScrollOffset() || mScroller.isFinished();
             int curY = mScroller.getCurrY();

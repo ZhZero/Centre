@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF0000"
+    android:paddingTop="100dp"
+    tools:context="com.zzl.centre.activity.ViewActivity">
+
+    <TextView
+        android:gravity="center"
+        android:text="哈哈"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#00FF00"/>
+
+</RelativeLayout>

@@ -17,12 +17,13 @@ import com.zzl.centre.refresh.indicator.PtrIndicator;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class PtrClassicDefaultHeader extends FrameLayout implements PtrUIHandler {
 
     private final static String KEY_SharedPreferences = "cube_ptr_classic_last_update";
-    private static SimpleDateFormat sDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat sDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     private int mRotateAniTime = 150;
     private RotateAnimation mFlipAnimation;
     private RotateAnimation mReverseFlipAnimation;
@@ -55,6 +56,7 @@ public class PtrClassicDefaultHeader extends FrameLayout implements PtrUIHandler
         TypedArray arr = getContext().obtainStyledAttributes(attrs, R.styleable.PtrClassicHeader, 0, 0);
         if (arr != null) {
             mRotateAniTime = arr.getInt(R.styleable.PtrClassicHeader_ptr_rotate_ani_time, mRotateAniTime);
+            arr.recycle();
         }
         buildAnimation();
         View header = LayoutInflater.from(getContext()).inflate(R.layout.cube_ptr_classic_default_header, this);
@@ -86,8 +88,6 @@ public class PtrClassicDefaultHeader extends FrameLayout implements PtrUIHandler
 
     /**
      * Specify the last update time by this key string
-     *
-     * @param key
      */
     public void setLastUpdateTimeKey(String key) {
         if (TextUtils.isEmpty(key)) {
@@ -98,8 +98,6 @@ public class PtrClassicDefaultHeader extends FrameLayout implements PtrUIHandler
 
     /**
      * Using an object to specify the last update time.
-     *
-     * @param object
      */
     public void setLastUpdateTimeRelateObject(Object object) {
         setLastUpdateTimeKey(object.getClass().getName());
@@ -177,7 +175,7 @@ public class PtrClassicDefaultHeader extends FrameLayout implements PtrUIHandler
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(KEY_SharedPreferences, 0);
         if (!TextUtils.isEmpty(mLastUpdateTimeKey)) {
             mLastUpdateTime = new Date().getTime();
-            sharedPreferences.edit().putLong(mLastUpdateTimeKey, mLastUpdateTime).commit();
+            sharedPreferences.edit().putLong(mLastUpdateTimeKey, mLastUpdateTime).apply();
         }
     }
 
@@ -215,7 +213,8 @@ public class PtrClassicDefaultHeader extends FrameLayout implements PtrUIHandler
         sb.append(getContext().getString(R.string.cube_ptr_last_update));
 
         if (seconds < 60) {
-            sb.append(seconds + getContext().getString(R.string.cube_ptr_seconds_ago));
+            sb.append(seconds);
+            sb.append(getContext().getString(R.string.cube_ptr_seconds_ago));
         } else {
             int minutes = (seconds / 60);
             if (minutes > 60) {
@@ -224,11 +223,13 @@ public class PtrClassicDefaultHeader extends FrameLayout implements PtrUIHandler
                     Date date = new Date(mLastUpdateTime);
                     sb.append(sDataFormat.format(date));
                 } else {
-                    sb.append(hours + getContext().getString(R.string.cube_ptr_hours_ago));
+                    sb.append(hours);
+                    sb.append(getContext().getString(R.string.cube_ptr_hours_ago));
                 }
 
             } else {
-                sb.append(minutes + getContext().getString(R.string.cube_ptr_minutes_ago));
+                sb.append(minutes);
+                sb.append(getContext().getString(R.string.cube_ptr_minutes_ago));
             }
         }
         return sb.toString();

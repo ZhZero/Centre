@@ -2,7 +2,7 @@ package com.zzl.centre.refresh.indicator;
 
 public class PtrTensionIndicator extends PtrIndicator {
 
-    private float DRAG_RATE = 0.5f;
+    /*private float DRAG_RATE = 0.5f;
     private float mDownY;
     private float mDownPos;
     private float mOneHeight = 0;
@@ -115,5 +115,5 @@ public class PtrTensionIndicator extends PtrIndicator {
             // after release
             return mReleasePercent * getCurrentPosY() / mReleasePos;
         }
-    }
+    }*/
 }
