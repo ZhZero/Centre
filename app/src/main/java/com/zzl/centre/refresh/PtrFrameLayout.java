@@ -15,6 +15,8 @@ import com.zzl.centre.R;
 import com.zzl.centre.refresh.indicator.PtrIndicator;
 import com.zzl.centre.refresh.util.PtrCLog;
 
+import java.util.Locale;
+
 /**
  * This layout view for "Pull to Refresh(Ptr)" support all of the view, you can contain everything you want.
  * support: pull to refresh / release to refresh / auto refresh / keep header view while refreshing / hide header view while refreshing
@@ -121,7 +123,6 @@ public class PtrFrameLayout extends ViewGroup {
 
     @Override
     protected void onFinishInflate() {
-        PtrCLog.v(LOG_TAG, "onFinishInflate");
         final int childCount = getChildCount();
         if (childCount > 2) {
             throw new IllegalStateException("PtrFrameLayout can only contains 2 children");
@@ -192,9 +193,7 @@ public class PtrFrameLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        PtrCLog.v(LOG_TAG, "onMeasure");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
         if (isDebug()) {
             PtrCLog.d(LOG_TAG, "onMeasure frame: width: %s, height: %s, padding: %s %s %s %s",
                     getMeasuredWidth(), getMeasuredHeight(),
@@ -237,7 +236,6 @@ public class PtrFrameLayout extends ViewGroup {
 
     @Override
     protected void onLayout(boolean flag, int i, int j, int k, int l) {
-        PtrCLog.v(LOG_TAG, "onLayout");
         layoutChildren();
     }
 
@@ -254,7 +252,6 @@ public class PtrFrameLayout extends ViewGroup {
             final int right = left + mHeaderView.getMeasuredWidth();
             final int bottom = top + mHeaderView.getMeasuredHeight();
             mHeaderView.layout(left, top, right, bottom);
-            PtrCLog.v(LOG_TAG, "onLayout header: %s %s %s %s", left, top, right, bottom);
             if (isDebug()) {
                 PtrCLog.d(LOG_TAG, "onLayout header: %s %s %s %s", left, top, right, bottom);
             }
@@ -370,8 +367,7 @@ public class PtrFrameLayout extends ViewGroup {
      * @param deltaY
      */
     private void movePos(float deltaY) {
-        // has reached the top
-        //这种情况只有在moveUp && canMoveUp才会发生
+        // has reached the top TODO:以下判断好像一直不成立 --> deltaY < 0 --> moveUp && canMoveUp --> currentPps > 0
         if ((deltaY < 0 && mPtrIndicator.isInStartPosition())) {
             if (DEBUG) {
                 PtrCLog.e(LOG_TAG, String.format("has reached the top"));
@@ -380,7 +376,6 @@ public class PtrFrameLayout extends ViewGroup {
         }
 
         int to = mPtrIndicator.getCurrentPosY() + (int) deltaY;
-
         // over top   to < 0
         if (mPtrIndicator.willOverTop(to)) {
             if (DEBUG) {
@@ -390,7 +385,9 @@ public class PtrFrameLayout extends ViewGroup {
         }
 
         mPtrIndicator.setCurrentPos(to);
+        //一般情况下， change = deltaY
         int change = to - mPtrIndicator.getLastPosY();
+        PtrCLog.v(LOG_TAG, String.format(Locale.getDefault(), "deltaY:[%d],currentPos:[%d],change:[%d]",(int) deltaY, mPtrIndicator.getCurrentPosY(), change));
         updatePos(change);
     }
 
@@ -399,11 +396,13 @@ public class PtrFrameLayout extends ViewGroup {
             return;
         }
 
+        //onPressDown的时候 等于true
         boolean isUnderTouch = mPtrIndicator.isUnderTouch();
 
         // once moved, cancel event will be sent to child
         if (isUnderTouch && !mHasSendCancelEvent && mPtrIndicator.hasMovedAfterPressedDown()) {
             mHasSendCancelEvent = true;
+            //TODO:目前猜测以下代码是达到禁止子View的事件分发，防止事件冲突
             sendCancelEvent();
         }
 
