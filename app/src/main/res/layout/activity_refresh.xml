@@ -22,9 +22,11 @@
         tools:context="com.zzl.centre.activity.RefreshActivity">
 
         <TextView
+            android:textColor="#C98466"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:textSize="16sp"
             android:text="Hello World !"/>
 
     </com.zzl.centre.refresh.PtrClassicFrameLayout>

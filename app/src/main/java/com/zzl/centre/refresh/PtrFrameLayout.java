@@ -35,6 +35,7 @@ public class PtrFrameLayout extends ViewGroup {
     private static int ID = 1;
     protected final String LOG_TAG = "ptr-frame-" + ++ID;
     // auto refresh status
+    private int mFlag = 0x00;
     private final static byte FLAG_AUTO_REFRESH_AT_ONCE = 0x01;
     private final static byte FLAG_AUTO_REFRESH_BUT_LATER = 0x01 << 1;
     private final static byte FLAG_ENABLE_NEXT_PTR_AT_ONCE = 0x01 << 2;
@@ -60,7 +61,6 @@ public class PtrFrameLayout extends ViewGroup {
      * 适配ViewPager用
      */
     private boolean mDisableWhenHorizontalMove = false;
-    private int mFlag = 0x00;
 
     // disable when detect moving horizontally
     private boolean mPreventForHorizontal = false;
@@ -136,7 +136,6 @@ public class PtrFrameLayout extends ViewGroup {
 
             // not specify header or content
             if (mContent == null || mHeaderView == null) {
-
                 View child1 = getChildAt(0);
                 View child2 = getChildAt(1);
                 if (child1 instanceof PtrUIHandler) {
@@ -387,7 +386,7 @@ public class PtrFrameLayout extends ViewGroup {
         mPtrIndicator.setCurrentPos(to);
         //一般情况下， change = deltaY
         int change = to - mPtrIndicator.getLastPosY();
-        PtrCLog.v(LOG_TAG, String.format(Locale.getDefault(), "deltaY:[%d],currentPos:[%d],change:[%d]",(int) deltaY, mPtrIndicator.getCurrentPosY(), change));
+        PtrCLog.v(LOG_TAG, String.format(Locale.getDefault(), "deltaY:[%d],currentPos:[%d],change:[%d]", (int) deltaY, mPtrIndicator.getCurrentPosY(), change));
         updatePos(change);
     }
 
